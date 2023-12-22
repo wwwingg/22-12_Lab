@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rolling Dice Simulator</title>
+  <style>
+    .dice-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .dice {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .die {
+      width: 80px;
+      height: 80px;
+      margin: 5px;
+    }
+
+    #statistics {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    #statistics table {
+      margin-top: 10px;
+      border-collapse: collapse;
+    }
+
+    #statistics table th,
+    #statistics table td {
+      padding: 5px 10px;
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <h1>Rolling Dice Simulator</h1>
+  <button onclick="rollDice()">Roll Dice</button>
+  <div class="dice-row">
+    <div class="dice" id="diceContainer1"></div>
+  </div>
+  <div class="dice-row">
+    <div class="dice" id="diceContainer2"></div>
+  </div>
+  <div id="statistics"></div>
+
+  <script>
+    function rollDice() {
+      const diceContainer1 = document.getElementById("diceContainer1");
+      const diceContainer2 = document.getElementById("diceContainer2");
+      diceContainer1.innerHTML = "";
+      diceContainer2.innerHTML = "";
+
+      const dice = [1, 2, 3, 4, 5, 6];
+      const rolls = Array.from({ length: 12 }, () => Math.floor(Math.random() * 6) + 1);
+
+      const rollsRow1 = rolls.slice(0, 6);
+      const rollsRow2 = rolls.slice(6, 12);
+
+      rollsRow1.forEach((roll) => {
+        const die = createDie(roll);
+        diceContainer1.appendChild(die);
+      });
+
+      rollsRow2.forEach((roll) => {
+        const die = createDie(roll);
+        diceContainer2.appendChild(die);
+      });
+
+      displayStatistics(rolls, dice);
+    }
+
+    function createDie(roll) {
+      const die = document.createElement("img");
+      die.className = "die";
+      die.src = "die" + roll + ".png"; // Assuming the dice images are named as die1.png, die2.png, etc.
+      return die;
+    }
+
+    function displayStatistics(rolls, dice) {
+      const statistics = document.getElementById("statistics");
+      statistics.innerHTML = "";
+
+      const counts = dice.map((face) => rolls.filter((roll) => roll === face).length);
+
+      const table = document.createElement("table");
+
+      const probabilitiesRow = document.createElement("tr");
+      const probabilitiesCell = document.createElement("td");
+      probabilitiesCell.style.fontWeight = "bold";
+      probabilitiesCell.style.textAlign = "center";
+      probabilitiesCell.textContent = "Face Probability";
+      probabilitiesRow.appendChild(probabilitiesCell);
+      table.appendChild(probabilitiesRow);
+
+      const probabilitiesData = calculateProbabilities(counts);
+      probabilitiesData.forEach((probability) => {
+        const row = document.createElement("tr");
+        const probabilityCell = document.createElement("td");
+        probabilityCell.textContent = probability;
+        row.appendChild(probabilityCell);
+        table.appendChild(row);
+      });
+
+      statistics.appendChild(table);
+    }
+
+    function calculateProbabilities(counts) {
+      const totalRolls = counts.reduce((sum, count) => sum + count, 0);
+      return counts.map((count, index) => {
+        const face = index + 1;
+        const probability = ((count / totalRolls) * 100).toFixed(2) + "%";
+        return "Face " + face + ": " + probability;
+      });
+    }
+  </script>
+</body>
+</html>
